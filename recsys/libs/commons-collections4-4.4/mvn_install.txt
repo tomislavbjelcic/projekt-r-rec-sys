@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile="commons-collections4-4.4.jar" -DgroupId="org.apache.commons" -DartifactId="commons-collections4" -Dversion="4.4" -Dpackaging="jar" -Djavadoc="commons-collections4-4.4-javadoc.jar" -Dsources="commons-collections4-4.4-sources.jar"

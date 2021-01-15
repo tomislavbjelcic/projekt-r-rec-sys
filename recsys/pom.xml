@@ -4,8 +4,8 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>hr.fer.oprpp1.jmbag0036513877</groupId>
-	<artifactId>hw08-0036513877</artifactId>
+	<groupId>hr.fer.projektr.jmbag0036513877</groupId>
+	<artifactId>recsys</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
@@ -17,5 +17,19 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.jupiter.version>5.7.0</junit.jupiter.version>
 	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.6.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.4</version>
+		</dependency>
+	</dependencies>
 	
 </project>
