@@ -1,8 +1,13 @@
 package hr.fer.projektr.utilitymatrix;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.math3.linear.OpenMapRealMatrix;
+import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SparseRealMatrix;
 
 public class UtilityMatrix {
@@ -66,6 +71,16 @@ public class UtilityMatrix {
 		return ri == null ? -1 : ri.intValue();
 	}
 	
+	public int getUserIDforRowIndex(int rowIndex) {
+		Objects.checkIndex(rowIndex, nextRowIndex);
+		return rowIndexToUserID.get(rowIndex).intValue();
+	}
+	
+	public int getItemIDforColIndex(int colIndex) {
+		Objects.checkIndex(colIndex, nextColIndex);
+		return colIndexToItemID.get(colIndex).intValue();
+	}
+	
 	
 	public int getColIndexForItemID(int itemId) {
 		Integer ci = colIndexToItemID.getKey(itemId);
@@ -89,6 +104,49 @@ public class UtilityMatrix {
 		return storage.getEntry(r, c);
 	}
 	
+	public Map<Integer, Double> getAverageRatingsForUsers() {
+		Map<Integer, Double> avgRatingsMap = new HashMap<>();
+		for (var entry : rowIndexToUserID.entrySet()) {
+			int row = entry.getKey();
+			int userId = entry.getValue();
+			RealVector rowVector = storage.getRowVector(row);
+			int dim = rowVector.getDimension();
+			int count = 0;
+			double sum = 0.0;
+			for (int i=0; i<dim; i++) {
+				double r = rowVector.getEntry(i);
+				if (r == 0.0)
+					continue;
+				sum += r;
+				count++;
+			}
+			double avg = sum / count;
+			avgRatingsMap.put(userId, avg);
+		}
+		return avgRatingsMap;
+	}
+	
+	public Map<Integer, Double> getAverageRatingsForItems() {
+		Map<Integer, Double> avgRatingsMap = new HashMap<>();
+		for (var entry : colIndexToItemID.entrySet()) {
+			int col = entry.getKey();
+			int itemId = entry.getValue();
+			RealVector colVector = storage.getColumnVector(col);
+			int dim = colVector.getDimension();
+			int count = 0;
+			double sum = 0.0;
+			for (int i=0; i<dim; i++) {
+				double r = colVector.getEntry(i);
+				if (r == 0.0)
+					continue;
+				sum += r;
+				count++;
+			}
+			double avg = sum / count;
+			avgRatingsMap.put(itemId, avg);
+		}
+		return avgRatingsMap;
+	}
 	
 	
 	
