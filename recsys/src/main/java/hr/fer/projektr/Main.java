@@ -2,9 +2,11 @@ package hr.fer.projektr;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import hr.fer.projektr.logger.Logger;
 import hr.fer.projektr.logger.StandardOutputLogger;
+import hr.fer.projektr.util.RecSysUtil;
 import hr.fer.projektr.utilitymatrix.UtilityMatrix;
 import hr.fer.projektr.utilitymatrix.UtilityMatrixLoader;
 
@@ -35,14 +37,17 @@ public class Main {
 		
 		UtilityMatrixLoader loader = new UtilityMatrixLoader(users, items, logger);
 		UtilityMatrix m = loader.loadUtilityMatrix(trainingSetPath);
-		var a = m.getAverageRatingsForUsers();
-		a.forEach((k, v) -> {
-			logger.log(String.format("User %d prosjek %f", k, v));
-		});
-		var kk = m.getAverageRatingsForItems();
-		kk.forEach((k, v) -> {
-			logger.log(String.format("Item %d prosjek %f", k, v));
-		});
+		Map<Integer, Double> userAvgRatings = m.getAverageRatingsForUsers();
+		int itemCount = m.itemCount();
+		for (int i=0; i<itemCount; i++) {
+			int itemId1 = m.getItemIDforColIndex(i);
+			for (int j=i+1; j<itemCount; j++) {
+				int itemId2 = m.getItemIDforColIndex(j);
+				double sim = RecSysUtil.itemSimilarity(itemId1, itemId2, m, userAvgRatings);
+				String msg = String.format("Sim(%d, %d): %f", itemId1, itemId2, sim);
+				logger.log(msg);
+			}
+		}
 	}
 	
 }

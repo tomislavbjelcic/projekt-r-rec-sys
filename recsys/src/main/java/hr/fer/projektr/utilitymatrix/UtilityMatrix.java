@@ -110,7 +110,7 @@ public class UtilityMatrix {
 	}
 	
 	public RealVector getColVectorForItemID(int itemId) {
-		int c = this.getRowIndexForUserID(itemId);
+		int c = this.getColIndexForItemID(itemId);
 		return c == -1 ? null : storage.getColumnVector(c);
 	}
 	
@@ -152,7 +152,7 @@ public class UtilityMatrix {
 				sum += r;
 				count++;
 			}
-			double avg = sum / count;
+			double avg = count == 0 ? 0.0 : sum / count;
 			avgRatingsMap.put(itemId, avg);
 		}
 		return avgRatingsMap;
