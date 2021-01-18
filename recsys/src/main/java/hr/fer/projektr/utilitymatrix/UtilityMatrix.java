@@ -104,6 +104,16 @@ public class UtilityMatrix {
 		return storage.getEntry(r, c);
 	}
 	
+	public RealVector getRowVectorForUserID(int userId) {
+		int r = this.getRowIndexForUserID(userId);
+		return r == -1 ? null : storage.getRowVector(r);
+	}
+	
+	public RealVector getColVectorForItemID(int itemId) {
+		int c = this.getRowIndexForUserID(itemId);
+		return c == -1 ? null : storage.getColumnVector(c);
+	}
+	
 	public Map<Integer, Double> getAverageRatingsForUsers() {
 		Map<Integer, Double> avgRatingsMap = new HashMap<>();
 		for (var entry : rowIndexToUserID.entrySet()) {
