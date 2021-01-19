@@ -19,6 +19,7 @@ class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 	long itemsVisited = 0L;
 	long ratingsAdded = 0L;
 	long mostRatings = 0L;
+	int cnt = 0;
 	
 	TrainingSetFileVisitor(UtilityMatrix utilityMatrix, Logger logger) {
 		this.utilityMatrix = utilityMatrix;
@@ -72,6 +73,10 @@ class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 				double rating = Double.parseDouble(splitted[1]);
 				
 				counter++;
+				cnt++;
+				if (cnt < 10)
+					continue;
+				cnt=0;
 				utilityMatrix.addUserID(userId);
 				boolean b = utilityMatrix.setRating(userId, itemId, rating);
 				if (b)

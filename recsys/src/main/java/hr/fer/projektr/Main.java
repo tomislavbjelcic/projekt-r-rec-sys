@@ -6,6 +6,7 @@ import java.util.Map;
 
 import hr.fer.projektr.logger.Logger;
 import hr.fer.projektr.logger.StandardOutputLogger;
+import hr.fer.projektr.util.RecSysUtil;
 import hr.fer.projektr.utilitymatrix.ItemSimilarityPairs;
 import hr.fer.projektr.utilitymatrix.UtilityMatrix;
 import hr.fer.projektr.utilitymatrix.UtilityMatrixLoader;
@@ -43,8 +44,17 @@ public class Main {
 		ItemSimilarityPairs isp = new ItemSimilarityPairs();
 		int itemCount = m.itemCount();
 		int userCount = m.userCount();
-		logger.log(itemCount);
-		logger.log(userCount);
+		logger.log("Izracun prosjeka gotov. Racunam ocjene...");
+		int counter = 0;
+		for (int u=0; u<userCount; u++) {
+			int uid = m.getUserIDforRowIndex(u);
+			for (int i=0; i<itemCount; i++) {
+				int iid = m.getItemIDforColIndex(i);
+				double r = RecSysUtil.estimateRating(uid, iid, m, isp, userAvgRatings, itemAvgRatings);
+				counter++;
+				logger.log(String.format("(%d, %d) ocjena: %f, prosao ih %d", uid, iid, r, counter));
+			}
+		}
 		/*
 		for (int i=0; i<itemCount; i++) {
 			int itemId1 = m.getItemIDforColIndex(i);
