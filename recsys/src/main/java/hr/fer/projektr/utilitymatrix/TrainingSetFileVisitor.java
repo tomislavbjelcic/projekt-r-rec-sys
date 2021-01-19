@@ -16,6 +16,9 @@ class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 	private static final String FILE_REGEX = "mv_(\\d)+\\.txt";
 	private UtilityMatrix utilityMatrix;
 	private Logger logger;
+	long itemsVisited = 0L;
+	long ratingsAdded = 0L;
+	long mostRatings = 0L;
 	
 	TrainingSetFileVisitor(UtilityMatrix utilityMatrix, Logger logger) {
 		this.utilityMatrix = utilityMatrix;
@@ -50,7 +53,8 @@ class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 		}
 		
 		try (BufferedReader br = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-			logger.log("Otvaram datoteku " + fileName);
+			itemsVisited++;
+			logger.log("Otvaram datoteku " + fileName + ". Otvorio ih već " + itemsVisited);
 			
 			String firstLine = br.readLine();
 			int itemIdCheck = Integer.parseInt(firstLine.substring(0, firstLine.length() - 1));
@@ -59,6 +63,7 @@ class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 				return FileVisitResult.TERMINATE;
 			}
 			
+			long counter = 0L;
 			while(true) {
 				String line = br.readLine();
 				if (line == null) break;
@@ -66,9 +71,14 @@ class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 				int userId = Integer.parseInt(splitted[0]);
 				double rating = Double.parseDouble(splitted[1]);
 				
+				counter++;
 				utilityMatrix.addUserID(userId);
-				utilityMatrix.setRating(userId, itemId, rating);
+				boolean b = utilityMatrix.setRating(userId, itemId, rating);
+				if (b)
+					ratingsAdded++;
 			}
+			mostRatings = Math.max(counter, mostRatings);
+			logger.log("Dodano " + ratingsAdded + " ocjena. Film sa najvise ocjena ih ima " + mostRatings);
 		}
 		
 		return FileVisitResult.CONTINUE;

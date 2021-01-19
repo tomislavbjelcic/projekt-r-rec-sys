@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import hr.fer.projektr.util.RecSysUtil;
-
 public class ItemSimilarityPairs {
 	
 	private static class UnorderedIntPair {
@@ -55,21 +53,6 @@ public class ItemSimilarityPairs {
 	public Double getSimilarity(int itemId1, int itemId2) {
 		getterPair.setPair(itemId1, itemId2);
 		return similarities.get(getterPair);
-	}
-	
-	public void putAllSimilaritiesForItem(int itemId, UtilityMatrix m, Map<Integer, Double> userAvgRatings) {
-		int itemIdx = m.getColIndexForItemID(itemId);
-		if (itemIdx == -1)
-			return;
-		
-		int itemCount = m.itemCount();
-		for (int i=0; i<itemCount; i++) {
-			if (i==itemIdx)
-				continue;
-			int itemIdOther = m.getItemIDforColIndex(i);
-			double sim = RecSysUtil.itemSimilarity(itemId, itemIdOther, m, userAvgRatings);
-			putSimilarity(itemId, itemIdOther, sim);
-		}
 	}
 
 }

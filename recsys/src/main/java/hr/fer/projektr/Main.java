@@ -6,7 +6,7 @@ import java.util.Map;
 
 import hr.fer.projektr.logger.Logger;
 import hr.fer.projektr.logger.StandardOutputLogger;
-import hr.fer.projektr.util.RecSysUtil;
+import hr.fer.projektr.utilitymatrix.ItemSimilarityPairs;
 import hr.fer.projektr.utilitymatrix.UtilityMatrix;
 import hr.fer.projektr.utilitymatrix.UtilityMatrixLoader;
 
@@ -37,8 +37,15 @@ public class Main {
 		
 		UtilityMatrixLoader loader = new UtilityMatrixLoader(users, items, logger);
 		UtilityMatrix m = loader.loadUtilityMatrix(trainingSetPath);
+		logger.log("Ucitavanje gotovo. Racunam prosjeke...");
 		Map<Integer, Double> userAvgRatings = m.getAverageRatingsForUsers();
+		Map<Integer, Double> itemAvgRatings = m.getAverageRatingsForItems();
+		ItemSimilarityPairs isp = new ItemSimilarityPairs();
 		int itemCount = m.itemCount();
+		int userCount = m.userCount();
+		logger.log(itemCount);
+		logger.log(userCount);
+		/*
 		for (int i=0; i<itemCount; i++) {
 			int itemId1 = m.getItemIDforColIndex(i);
 			for (int j=i+1; j<itemCount; j++) {
@@ -48,6 +55,11 @@ public class Main {
 				logger.log(msg);
 			}
 		}
+		int u = 3;
+		int i = 3;
+		double est = RecSysUtil.estimateRating(u, i, m, isp, userAvgRatings, itemAvgRatings);
+		logger.log(String.format("Estimate for user %d item %d: %f", u, i, est));
+		*/
 	}
 	
 }

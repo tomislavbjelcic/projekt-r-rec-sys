@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SparseRealMatrix;
 
@@ -130,8 +129,10 @@ public class UtilityMatrix {
 				sum += r;
 				count++;
 			}
-			double avg = sum / count;
-			avgRatingsMap.put(userId, avg);
+			if (count > 0) {
+				double avg = sum / count;
+				avgRatingsMap.put(userId, avg);
+			}
 		}
 		return avgRatingsMap;
 	}
@@ -152,8 +153,10 @@ public class UtilityMatrix {
 				sum += r;
 				count++;
 			}
-			double avg = count == 0 ? 0.0 : sum / count;
-			avgRatingsMap.put(itemId, avg);
+			if (count > 0) {
+				double avg = sum / count;
+				avgRatingsMap.put(itemId, avg);
+			}
 		}
 		return avgRatingsMap;
 	}
