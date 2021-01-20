@@ -1,5 +1,9 @@
 package hr.fer.projektr;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -8,6 +12,7 @@ import hr.fer.projektr.logger.Logger;
 import hr.fer.projektr.logger.StandardOutputLogger;
 import hr.fer.projektr.util.RecSysUtil;
 import hr.fer.projektr.utilitymatrix.ItemSimilarityPairs;
+import hr.fer.projektr.utilitymatrix.TrainingSetFileVisitor;
 import hr.fer.projektr.utilitymatrix.UtilityMatrix;
 import hr.fer.projektr.utilitymatrix.UtilityMatrixLoader;
 
@@ -39,12 +44,47 @@ public class Main {
 		UtilityMatrixLoader loader = new UtilityMatrixLoader(users, items, logger);
 		UtilityMatrix m = loader.loadUtilityMatrix(trainingSetPath);
 		logger.log("Ucitavanje gotovo. Racunam prosjeke...");
-		Map<Integer, Double> userAvgRatings = m.getAverageRatingsForUsers();
-		Map<Integer, Double> itemAvgRatings = m.getAverageRatingsForItems();
+		TrainingSetFileVisitor visitor = loader.getVisitor();
+		Map<Integer, Double> userAvgRatings = visitor.getUserAvgRatings();
+		Map<Integer, Double> itemAvgRatings = visitor.getItemAvgRatings();
+		logger.log("Racunanje prosjeka gotovo.");
+		
 		ItemSimilarityPairs isp = new ItemSimilarityPairs();
 		int itemCount = m.itemCount();
 		int userCount = m.userCount();
 		logger.log("Izracun prosjeka gotov. Racunam ocjene...");
+		
+		Path qualifyingPath = trainingSetPath.resolve("../qualifying.txt");
+		try(BufferedReader br = Files.newBufferedReader(qualifyingPath, StandardCharsets.UTF_8)) {
+			int itemId = -1;
+			long counter = 0L;
+			while (true) {
+				String line = br.readLine();
+				if (line == null) break;
+				
+				int lineLen = line.length();
+				char last = line.charAt(lineLen - 1);
+				if (last == ':') {
+					itemId = Integer.parseInt(line.substring(0, lineLen-1));
+					continue;
+				}
+				
+				String[] splitted = line.split(",");
+				int userId = Integer.parseInt(splitted[0]);
+				counter++;
+				
+				double r = RecSysUtil.estimateRating(userId, itemId, m, isp, userAvgRatings, itemAvgRatings);
+				String msg = String.format("User %d Item %d Ocjena: %f. Izračunato %d ocjena", userId, itemId, r, counter);
+				logger.log(msg);
+				
+				
+			}
+			
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		
+		/*
 		int counter = 0;
 		for (int u=0; u<userCount; u++) {
 			int uid = m.getUserIDforRowIndex(u);
@@ -54,7 +94,8 @@ public class Main {
 				counter++;
 				logger.log(String.format("(%d, %d) ocjena: %f, prosao ih %d", uid, iid, r, counter));
 			}
-		}
+		}*/
+		
 		/*
 		for (int i=0; i<itemCount; i++) {
 			int itemId1 = m.getItemIDforColIndex(i);

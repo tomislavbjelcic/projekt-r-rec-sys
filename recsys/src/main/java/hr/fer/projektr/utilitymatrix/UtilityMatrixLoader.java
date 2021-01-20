@@ -1,7 +1,6 @@
 package hr.fer.projektr.utilitymatrix;
 
 import java.io.IOException;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -16,6 +15,7 @@ public class UtilityMatrixLoader {
 	private int colLimit;
 	private int rowLimit;
 	private Logger logger;
+	private TrainingSetFileVisitor visitor;
 	
 	public UtilityMatrixLoader(int rowLimit, int colLimit, Logger logger) {
 		this.configureDimensionsLimit(rowLimit, colLimit);
@@ -39,7 +39,7 @@ public class UtilityMatrixLoader {
 			throw new RuntimeException("Putanja " + trainingSetPath + " ne predstavlja direktorij.");
 		
 		UtilityMatrix utilityMatrix = new UtilityMatrix(rowLimit, colLimit);
-		FileVisitor<Path> visitor = new TrainingSetFileVisitor(utilityMatrix, logger);
+		visitor = new TrainingSetFileVisitor(utilityMatrix, logger);
 		try {
 			Files.walkFileTree(trainingSetPath, visitor);
 		} catch (IOException e) {
@@ -49,10 +49,8 @@ public class UtilityMatrixLoader {
 		return utilityMatrix;
 	}
 	
-	public static void main(String[] args) {
-		String s = "mv_47784.txt";
-		boolean matches = s.matches(FILE_REGEX);
-		System.out.println(matches);
+	public TrainingSetFileVisitor getVisitor() {
+		return visitor;
 	}
 
 }

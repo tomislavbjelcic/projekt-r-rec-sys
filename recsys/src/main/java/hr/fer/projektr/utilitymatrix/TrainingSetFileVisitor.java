@@ -8,20 +8,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.Map;
 
 import hr.fer.projektr.logger.Logger;
 
-class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
+public class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
+	
+	private static class AvgInfo {
+		long sum = 0L;
+		long count = 0L;
+	}
 	
 	private static final String FILE_REGEX = "mv_(\\d)+\\.txt";
 	private UtilityMatrix utilityMatrix;
 	private Logger logger;
-	long itemsVisited = 0L;
-	long ratingsAdded = 0L;
-	long mostRatings = 0L;
-	int cnt = 0;
+	private long itemsVisited = 0L;
+	private long ratingsAdded = 0L;
+	private long mostRatings = 0L;
+	private int cnt = 0;
+	private Map<Integer, Double> userAvgRatings = new HashMap<>();
+	private Map<Integer, AvgInfo> userAvgRatingsTmp = new HashMap<>();
+	private Map<Integer, Double> itemAvgRatings = new HashMap<>();
 	
-	TrainingSetFileVisitor(UtilityMatrix utilityMatrix, Logger logger) {
+	public TrainingSetFileVisitor(UtilityMatrix utilityMatrix, Logger logger) {
 		this.utilityMatrix = utilityMatrix;
 		this.logger = logger;
 	}
@@ -64,29 +74,66 @@ class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 				return FileVisitResult.TERMINATE;
 			}
 			
+			
+			long sum = 0L;
 			long counter = 0L;
 			while(true) {
 				String line = br.readLine();
 				if (line == null) break;
-				String[] splitted = line.split(",");
-				int userId = Integer.parseInt(splitted[0]);
-				double rating = Double.parseDouble(splitted[1]);
 				
-				counter++;
 				cnt++;
 				if (cnt < 10)
 					continue;
 				cnt=0;
+				
+				String[] splitted = line.split(",");
+				int userId = Integer.parseInt(splitted[0]);
+				long ratingLong = Long.parseLong(splitted[1]);
+				double rating = ratingLong;
+				
+				
+				
 				utilityMatrix.addUserID(userId);
 				boolean b = utilityMatrix.setRating(userId, itemId, rating);
-				if (b)
-					ratingsAdded++;
+				if (!b) {
+					continue;
+				}
+				counter++;
+				AvgInfo ai = userAvgRatingsTmp.get(userId);
+				if (ai == null) {
+					ai = new AvgInfo();
+					userAvgRatingsTmp.put(userId, ai);
+				}
+				ai.count++;
+				ai.sum += ratingLong;
+				sum += ratingLong;
 			}
+			double avg = counter == 0L ? 0.0 : (sum * 1.0) / counter;
+			itemAvgRatings.put(itemId, avg);
 			mostRatings = Math.max(counter, mostRatings);
 			logger.log("Dodano " + ratingsAdded + " ocjena. Film sa najvise ocjena ih ima " + mostRatings);
 		}
 		
 		return FileVisitResult.CONTINUE;
+	}
+	
+	@Override
+	public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+		userAvgRatingsTmp.forEach((k, v) -> {
+			if (v.count == 0L)
+				return;
+			double avg = (v.sum * 1.0) / v.count;
+			userAvgRatings.put(k, avg);
+		});
+		return FileVisitResult.TERMINATE;
+	}
+	
+	public Map<Integer, Double> getUserAvgRatings() {
+		return userAvgRatings;
+	}
+	
+	public Map<Integer, Double> getItemAvgRatings() {
+		return itemAvgRatings;
 	}
 	
 }
