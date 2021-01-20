@@ -56,7 +56,7 @@ public class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 		int colIdx = utilityMatrix.addItemID(itemId);
 		if (colIdx == -1) {
 			logger.log("Krenuo sam obrađivati " + fileName + " ali dostignut je maksimalan broj itema. Prekidam obilazak...");
-			return FileVisitResult.TERMINATE;
+			return FileVisitResult.SKIP_SIBLINGS;
 		}
 		if (colIdx < itemCount) {
 			logger.log("Item ID " + itemId + " već postoji učitan u matrici. Nastavljam obilazak...");
@@ -82,7 +82,7 @@ public class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 				if (line == null) break;
 				
 				cnt++;
-				if (cnt < 10)
+				if (cnt < 5)
 					continue;
 				cnt=0;
 				
@@ -99,6 +99,7 @@ public class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 					continue;
 				}
 				counter++;
+				ratingsAdded++;
 				AvgInfo ai = userAvgRatingsTmp.get(userId);
 				if (ai == null) {
 					ai = new AvgInfo();

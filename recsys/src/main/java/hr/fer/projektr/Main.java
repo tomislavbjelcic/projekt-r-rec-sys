@@ -58,6 +58,7 @@ public class Main {
 		try(BufferedReader br = Files.newBufferedReader(qualifyingPath, StandardCharsets.UTF_8)) {
 			int itemId = -1;
 			long counter = 0L;
+			boolean validItem = true;
 			while (true) {
 				String line = br.readLine();
 				if (line == null) break;
@@ -66,12 +67,21 @@ public class Main {
 				char last = line.charAt(lineLen - 1);
 				if (last == ':') {
 					itemId = Integer.parseInt(line.substring(0, lineLen-1));
+					validItem = m.getColIndexForItemID(itemId) != -1;
+					continue;
+				}
+				
+				if (!validItem) {
+					logger.log("lol");
 					continue;
 				}
 				
 				String[] splitted = line.split(",");
 				int userId = Integer.parseInt(splitted[0]);
 				counter++;
+				if (counter == 50L) {
+					int k = 3;
+				}
 				
 				double r = RecSysUtil.estimateRating(userId, itemId, m, isp, userAvgRatings, itemAvgRatings);
 				String msg = String.format("User %d Item %d Ocjena: %f. Izračunato %d ocjena", userId, itemId, r, counter);
