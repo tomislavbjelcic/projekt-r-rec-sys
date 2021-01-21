@@ -103,16 +103,31 @@ public class UtilityMatrix {
 		return storage.getEntry(r, c);
 	}
 	
+	/*
 	public RealVector getRowVectorForUserID(int userId) {
 		int r = this.getRowIndexForUserID(userId);
 		return r == -1 ? null : storage.getRowVector(r);
 	}
+	*/
 	
-	public RealVector getColVectorForItemID(int itemId) {
+	public void getAllUserRatingsForItemID(int itemId, Map<Integer, Double> m) {
 		int c = this.getColIndexForItemID(itemId);
-		return c == -1 ? null : storage.getColumnVector(c);
+		if (c == -1)
+			return;
+		
+		int userCount = this.userCount();
+		for (int i=0; i<userCount; i++) {
+			double r = storage.getEntry(i, c);
+			if (r == 0.0)
+				continue;
+			
+			int userId = this.getUserIDforRowIndex(i);
+			m.put(userId, r);
+			
+		}
 	}
 	
+	/*
 	public Map<Integer, Double> getAverageRatingsForUsers() {
 		Map<Integer, Double> avgRatingsMap = new HashMap<>();
 		for (var entry : rowIndexToUserID.entrySet()) {
@@ -160,6 +175,7 @@ public class UtilityMatrix {
 		}
 		return avgRatingsMap;
 	}
+	*/
 	
 	
 	

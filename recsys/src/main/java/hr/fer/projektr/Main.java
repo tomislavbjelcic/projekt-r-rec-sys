@@ -55,6 +55,9 @@ public class Main {
 		logger.log("Izracun prosjeka gotov. Racunam ocjene...");
 		
 		Path qualifyingPath = trainingSetPath.resolve("../qualifying.txt");
+		RecSysUtil.precomputeSimilarities(m, isp, userAvgRatings, qualifyingPath, logger);
+		
+		/*
 		try(BufferedReader br = Files.newBufferedReader(qualifyingPath, StandardCharsets.UTF_8)) {
 			int itemId = -1;
 			long counter = 0L;
@@ -93,6 +96,8 @@ public class Main {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+		*/
+		
 		
 		/*
 		int counter = 0;
@@ -116,11 +121,12 @@ public class Main {
 				logger.log(msg);
 			}
 		}
-		int u = 3;
-		int i = 3;
+		int u = 5;
+		int i = 1;
 		double est = RecSysUtil.estimateRating(u, i, m, isp, userAvgRatings, itemAvgRatings);
 		logger.log(String.format("Estimate for user %d item %d: %f", u, i, est));
 		*/
+		
 	}
 	
 }

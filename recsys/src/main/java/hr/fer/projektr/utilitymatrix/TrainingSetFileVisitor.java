@@ -81,10 +81,12 @@ public class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 				String line = br.readLine();
 				if (line == null) break;
 				
+				
 				cnt++;
 				if (cnt < 5)
 					continue;
 				cnt=0;
+				
 				
 				String[] splitted = line.split(",");
 				int userId = Integer.parseInt(splitted[0]);
