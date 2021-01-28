@@ -14,7 +14,7 @@ import hr.fer.projektr.utilitymatrix.UtilityMatrix;
 
 public class RecSysUtil {
 	
-	private static final double SIM_THRESH = 0.1;
+	private static final double SIM_THRESH = 0.2;
 	private static final Map<Integer, Double> m1 = new HashMap<>();
 	private static final Map<Integer, Double> m2 = new HashMap<>();
 	

@@ -8,5 +8,8 @@ public interface Logger extends Closeable {
 	default void log(Object o) {
 		log(String.valueOf(o));
 	}
+	String getLastLoggedMessage();
+	boolean getErrorStatus();
+	void setErrorStatus(boolean errorStatus);
 	
 }
