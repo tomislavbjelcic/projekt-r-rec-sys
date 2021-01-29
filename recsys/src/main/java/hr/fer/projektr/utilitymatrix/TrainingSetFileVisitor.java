@@ -51,6 +51,7 @@ public class TrainingSetFileVisitor extends SimpleFileVisitor<Path> {
 			return FileVisitResult.TERMINATE;
 		}
 		
+		
 		int itemId = getItemIdFromFileName(fileName);
 		int itemCount = utilityMatrix.itemCount();
 		int colIdx = utilityMatrix.addItemID(itemId);

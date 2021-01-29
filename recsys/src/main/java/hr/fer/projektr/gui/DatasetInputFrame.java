@@ -3,24 +3,27 @@ package hr.fer.projektr.gui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import hr.fer.projektr.gui.InputDataPanel.InputData;
+
 public class DatasetInputFrame extends JFrame {
 	
-	private int c = 0;
+	private static final int WHOLE_DATASET_ITEM_COUNT = 17770;
+	private static final int WHOLE_DATASET_USER_COUNT = 480189;
+	private InputDataPanel idp;
 
 	public DatasetInputFrame() {
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		this.setSize(500, 250);
+		this.setTitle("Učitaj dataset");
+		this.setSize(500, 150);
 		this.setLocationRelativeTo(null);
 		this.initGUI();
 	}
@@ -30,38 +33,54 @@ public class DatasetInputFrame extends JFrame {
 		cp.setLayout(new BorderLayout());
 		
 		
-		JPanel inputDataPanel = new JPanel();
-		int rows = 1;
-		int cols = 2;
-		inputDataPanel.setLayout(new BoxLayout(inputDataPanel, BoxLayout.Y_AXIS));
+		idp = new InputDataPanel();
+		cp.add(idp, BorderLayout.CENTER);
 		
-		JPanel firstRow = new JPanel(new FlowLayout());
-		
-		JLabel datasetPathLabel = new JLabel("Putanja:", SwingConstants.RIGHT);
-		JPanel datasetPnl = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 0));
-		JLabel pathLabel = new JLabel("lbn");
-		JButton choosePathBtn = new JButton("Odaberi putanju");
-		choosePathBtn.addActionListener(e -> {
-			
-		});
-		datasetPnl.add(choosePathBtn);
-		datasetPnl.add(pathLabel);
-		firstRow.add(datasetPathLabel);
-		firstRow.add(datasetPnl);
-		
-		inputDataPanel.add(firstRow);
-		
-		JPanel secondRow = new JPanel(new FlowLayout());
-		JLabel userCountLabel = new JLabel("Broj korisnika: ", SwingConstants.RIGHT);
-		JTextField userCountTf = new JTextField();
-		secondRow.add(userCountLabel);
-		secondRow.add(userCountTf);
-		
-		inputDataPanel.add(secondRow);
-		
-		cp.add(inputDataPanel);
+		JPanel loadPnl = new JPanel(new FlowLayout());
+		JButton loadBtn = new JButton("Učitaj");
+		loadBtn.addActionListener(this::loadButtonPressed);
+		loadPnl.add(loadBtn);
+		cp.add(loadPnl, BorderLayout.PAGE_END);
 		
 		
+	}
+	
+	private void loadButtonPressed(ActionEvent e) {
+		InputData data = idp.getInputData();
+		String err = checkAndParseData(data);
+		if (err != null) {
+			JOptionPane.showMessageDialog(this, err, "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+	}
+	
+	private static String checkAndParseData(InputData data) {
+		String userErr = "Broj korisnika mora biti prirodan broj između 1 i " + WHOLE_DATASET_USER_COUNT;
+		String itemErr = "Broj filmova mora biti između 1 i " + WHOLE_DATASET_ITEM_COUNT;
+		int userCount = -1;
+		try {
+			userCount = Integer.parseInt(data.userCountStr);
+		} catch (NumberFormatException ex) {
+			return userErr;
+		}
+		if (userCount < 1 || userCount > WHOLE_DATASET_USER_COUNT)
+			return userErr;
+		data.userCount = userCount;
+		
+		int itemCount = -1;
+		try {
+			itemCount = Integer.parseInt(data.itemCountStr);
+		} catch (NumberFormatException ex) {
+			return itemErr;
+		}
+		if (itemCount < 1 || itemCount > WHOLE_DATASET_ITEM_COUNT)
+			return itemErr;
+		data.itemCount = itemCount;
+		
+		if (data.trainingSetPath == null)
+			return "Putanja nije postavljena";
+		
+		return null;
 	}
 	
 	public static void main(String[] args) {
